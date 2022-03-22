@@ -79,7 +79,7 @@ def detectTextReality(x):
     # letters
     cs = [ord(c) - 97 for c in x]
     hist = np.histogram(cs, range=[0, 26], bins=26)
-    histNorm = hist[0]/np.sum(hist[0])
+    histNorm = hist[0] / np.sum(hist[0])
     mseLetters = mse(histNorm, letters[:, 1])
 
     # words
@@ -89,10 +89,11 @@ def detectTextReality(x):
 
     return mseWords + mseLetters
 
+print(detectTextReality(toBe))
 
 # GA
 subject = t2
-generationSize = 10000
+generationSize = 1000
 mn = np.min(subject)
 mx = np.max(subject)
 generation = [
@@ -112,7 +113,8 @@ def applyKey(t, k):
 def getOffspring(g1, g2):
     key1 = g1['key']
     key2 = g2['key']
-    keyChild = [key1[i] if random.random() > .5 else key2[i] for i in range(len(key1))]
+    keyChild = [key1[i] if random.random() > .5 else key2[i]
+                for i in range(len(key1))]
     return {
         'key': keyChild,
         'result': None,
@@ -122,7 +124,8 @@ def getOffspring(g1, g2):
 
 def getMutation(ind):
     keyParent = ind['key']
-    keyChild = [keyParent[i] if random.random() > .1 else chr(97 + random.randint(0, 25)) for i in range(len(keyParent))]
+    keyChild = [keyParent[i] if random.random() > .1 else chr(
+        97 + random.randint(0, 25)) for i in range(len(keyParent))]
     return {
         'key': keyChild,
         'result': None,
@@ -161,18 +164,19 @@ while(True):
 
     # new offsprings
     offsprings = []
-    for _ in range(5000):
-        p1 = random.randint(0, 10)
-        p2 = p1
-        while p2 == p1:
-            p2 = random.randint(0, 10)
-        offsprings.append(getOffspring(generation[p1], generation[p2]))
+    # for _ in range(500):
+    #     p1 = random.randint(0, 100)
+    #     p2 = p1
+    #     while p2 == p1:
+    #         p2 = random.randint(0, 100)
+    #     offsprings.append(getOffspring(generation[p1], generation[p2]))
 
     # new mutations
     mutations = []
     for _ in range(5000):
-        ind = random.randint(0, 10)
+        ind = random.randint(0, 100)
         mutations.append(getMutation(generation[ind]))
 
-    generation.extend(offsprings)
-    generation.extend(mutations)
+    generation = mutations
+    # .extend(offsprings)
+    # generation.extend(mutations)
