@@ -89,9 +89,8 @@ def detectTextReality(x):
 
     return mseWords + mseLetters
 
+
 # GA
-
-
 subject = t2
 generationSize = 100
 mn = np.min(subject)
@@ -104,12 +103,71 @@ generation = [
     } for _ in range(generationSize)
 ]
 
+
 def applyKey(t, k):
     result = ''.join([k[x-1] for x in t1])
     return result
 
-for g in generation:
-    g['result'] = applyKey(subject, g['key'])
-    g['loss'] = detectTextReality(g['result'])
+def getOffspring(g1, g2):
+    return {
+        'key': [],
+        'result': None,
+        'loss': None
+    }
+    
+def getMutation(ind):
+    return {
+        'key': [],
+        'result': None,
+        'loss': None
+    }
 
-a = 12
+
+gCount = 0
+while(True):
+    gCount = gCount + 1
+    # analyze
+    for g in generation:
+        if(g['result'] == None):
+            g['result'] = applyKey(subject, g['key'])
+        if(g['loss'] == None):
+            g['loss'] = detectTextReality(g['result'])
+
+    # sort
+    generation.sort(key=lambda x: x['loss'])
+
+    print(F"""GENERATION: {gCount}
+    TOP 3:
+    loss: {generation[0]['loss']}
+    text: {generation[0]['result']}
+    
+    loss: {generation[1]['loss']}
+    text: {generation[1]['result']}
+    
+    loss: {generation[2]['loss']}
+    text: {generation[2]['result']}
+    
+    """)
+
+    # kill
+    generation = generation[0: generationSize]
+
+    # new offsprings
+    offsprings = []
+    for _ in range(50):
+        p1 = random.randint(0, 10)
+        p2 = p1
+        while p2 == p1:
+            p2 = random.randint(0, 10)
+        offsprings.append(getOffspring(generation[p1], generation[p2]))
+
+    # new mutations
+    mutations = []
+    for _ in range(50):
+        ind = random.randint(0, 10)
+        mutations.append(getMutation(generation[ind]))
+    
+    generation.extend(offsprings)
+    generation.extend(mutations)
+
+
