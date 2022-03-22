@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
+import random
 key1 = ['When', 'in', 'the', 'course', 'of', 'human', 'events', 'it', 'becomes', 'necessary', 'for', 'one', 'people', 'to', 'dissolve', 'the', 'political', 'bands', 'which', 'have', 'connected', 'them', 'with', 'another', 'and', 'to', 'assume', 'among', 'the', 'powers', 'of', 'the', 'earth', 'the', 'separate', 'and', 'equal', 'station', 'to', 'which', 'the',
         'laws', 'of', 'nature', 'and', 'of', 'natures', 'god', 'entitle', 'them', 'a', 'decent', 'respect', 'to', 'the', 'opinions', 'of', 'mankind', 'requires', 'that', 'they', 'should', 'declare', 'the', 'causes', 'which', 'impel', 'them', 'to', 'the', 'separation', 'we', 'hold', 'these', 'truths', 'to', 'be', 'self', 'evident', 'that', 'all', 'men', 'are',
         'created', 'equal', 'that', 'they', 'are', 'endowed', 'by', 'their', 'creator', 'with', 'certain', 'unalienable', 'rights', 'that', 'among', 'these', 'are', 'life', 'liberty', 'and', 'the', 'pursuit', 'of', 'happiness', 'that', 'to', 'secure', 'these', 'rights', 'governments', 'are', 'instituted', 'among', 'men', 'deriving', 'their', 'just', 'powers', 'from',
@@ -49,7 +50,7 @@ became = ''.join([key1[x-1][0] for x in t1])
 # english truth
 wordKeys = ['the', 'of', 'and', 'to', 'in', 'is', 'that', 'was', 'for', 'with']
 wordValues = np.array([0.3026800785062991, 0.1461715514346583, 0.12687510486717887, 0.12221704261204332, 0.09153611104210377,
-              0.04681200012204337, 0.04671400231076448, 0.04401381499014022, 0.04122479639548728, 0.03175549771928139])
+                       0.04681200012204337, 0.04671400231076448, 0.04401381499014022, 0.04122479639548728, 0.03175549771928139])
 
 letters = np.array([
     [0, 0.07331462883813619], [1, 0.017410913286309882],
@@ -88,8 +89,27 @@ def detectTextReality(x):
 
     return mseWords + mseLetters
 
-
-print(detectTextReality(toBe))
-print(detectTextReality(became))
+# GA
 
 
+subject = t2
+generationSize = 100
+mn = np.min(subject)
+mx = np.max(subject)
+generation = [
+    {
+        'key': [chr(97 + random.randint(0, 25)) for _ in range(mx)],
+        'result': None,
+        'loss': None
+    } for _ in range(generationSize)
+]
+
+def applyKey(t, k):
+    result = ''.join([k[x-1] for x in t1])
+    return result
+
+for g in generation:
+    g['result'] = applyKey(subject, g['key'])
+    g['loss'] = detectTextReality(g['result'])
+
+a = 12
