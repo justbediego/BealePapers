@@ -92,7 +92,7 @@ def detectTextReality(x):
 
 # GA
 subject = t2
-generationSize = 100
+generationSize = 10000
 mn = np.min(subject)
 mx = np.max(subject)
 generation = [
@@ -108,16 +108,23 @@ def applyKey(t, k):
     result = ''.join([k[x-1] for x in t1])
     return result
 
+
 def getOffspring(g1, g2):
+    key1 = g1['key']
+    key2 = g2['key']
+    keyChild = [key1[i] if random.random() > .5 else key2[i] for i in range(len(key1))]
     return {
-        'key': [],
+        'key': keyChild,
         'result': None,
         'loss': None
     }
-    
+
+
 def getMutation(ind):
+    keyParent = ind['key']
+    keyChild = [keyParent[i] if random.random() > .1 else chr(97 + random.randint(0, 25)) for i in range(len(keyParent))]
     return {
-        'key': [],
+        'key': keyChild,
         'result': None,
         'loss': None
     }
@@ -146,7 +153,7 @@ while(True):
     
     loss: {generation[2]['loss']}
     text: {generation[2]['result']}
-    
+
     """)
 
     # kill
@@ -154,7 +161,7 @@ while(True):
 
     # new offsprings
     offsprings = []
-    for _ in range(50):
+    for _ in range(5000):
         p1 = random.randint(0, 10)
         p2 = p1
         while p2 == p1:
@@ -163,11 +170,9 @@ while(True):
 
     # new mutations
     mutations = []
-    for _ in range(50):
+    for _ in range(5000):
         ind = random.randint(0, 10)
         mutations.append(getMutation(generation[ind]))
-    
+
     generation.extend(offsprings)
     generation.extend(mutations)
-
-
