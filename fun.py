@@ -48,8 +48,8 @@ became = ''.join([key1[x-1][0] for x in t1])
 
 # english truth
 wordKeys = ['the', 'of', 'and', 'to', 'in', 'is', 'that', 'was', 'for', 'with']
-wordValues = [0.3026800785062991, 0.1461715514346583, 0.12687510486717887, 0.12221704261204332, 0.09153611104210377,
-              0.04681200012204337, 0.04671400231076448, 0.04401381499014022, 0.04122479639548728, 0.03175549771928139]
+wordValues = np.array([0.3026800785062991, 0.1461715514346583, 0.12687510486717887, 0.12221704261204332, 0.09153611104210377,
+              0.04681200012204337, 0.04671400231076448, 0.04401381499014022, 0.04122479639548728, 0.03175549771928139])
 
 letters = np.array([
     [0, 0.07331462883813619], [1, 0.017410913286309882],
@@ -68,16 +68,28 @@ letters = np.array([
 
 
 def detectTextReality(x):
+    def mse(p, t):
+        lp = np.log(p+1)
+        lt = np.log(t+1)
+        diff = lp - lt
+        sq = np.abs(diff)
+        return np.mean(sq)
+
+    # letters
     cs = [ord(c) - 97 for c in x]
-    hist = np.histogram(cs, range=[0, 27], bins=27)
+    hist = np.histogram(cs, range=[0, 26], bins=26)
     histNorm = hist[0]/np.sum(hist[0])
-    plt.plot(histNorm)
+    mseLetters = mse(histNorm, letters[:, 1])
+
+    # words
+    wFreq = [x.count(w) for w in wordKeys]
+    wFreq = wFreq / np.sum(wFreq)
+    mseWords = mse(wFreq, wordValues)
+
+    return mseWords + mseLetters
 
 
-plt.plot(letters[:, 1])
-detectTextReality(toBe)
-detectTextReality(became)
-plt.show()
+print(detectTextReality(toBe))
+print(detectTextReality(became))
 
-print(toBe)
-print(became)
+
