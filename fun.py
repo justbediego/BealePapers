@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from english_words import english_words_lower_alpha_set
 import numpy as np
 import random
 key1 = ['When', 'in', 'the', 'course', 'of', 'human', 'events', 'it', 'becomes', 'necessary', 'for', 'one', 'people', 'to', 'dissolve', 'the', 'political', 'bands', 'which', 'have', 'connected', 'them', 'with', 'another', 'and', 'to', 'assume', 'among', 'the', 'powers', 'of', 'the', 'earth', 'the', 'separate', 'and', 'equal', 'station', 'to', 'which', 'the',
@@ -67,6 +68,22 @@ letters = np.array([
     [22, 0.010173846920313607], [23, 0.003303878123606996],
     [24, 0.014500353986941815], [25, 0]])
 
+# coefs
+words = [word for word in english_words_lower_alpha_set]
+wordCoef = [1 for _ in english_words_lower_alpha_set]
+for i in range(len(words)):
+    word = words[i]
+    if word in wordKeys:
+        value = wordValues[wordKeys.index(word)]
+        wordCoef[i] = value / np.min(wordValues)
+
+
+def detectTextByFoundWords(x):
+    count = 0
+    for i in range(len(words)):
+        count = count + (x.count(words[i]) * wordCoef[i])
+    return -count
+
 
 def detectTextReality(x):
     def mse(p, t):
@@ -89,7 +106,9 @@ def detectTextReality(x):
 
     return mseWords + mseLetters
 
-print(detectTextReality(toBe))
+
+print(detectTextByFoundWords(toBe))
+print(detectTextByFoundWords(became))
 
 # GA
 subject = t2
@@ -141,7 +160,7 @@ while(True):
         if(g['result'] == None):
             g['result'] = applyKey(subject, g['key'])
         if(g['loss'] == None):
-            g['loss'] = detectTextReality(g['result'])
+            g['loss'] = detectTextByFoundWords(g['result'])
 
     # sort
     generation.sort(key=lambda x: x['loss'])
@@ -164,19 +183,18 @@ while(True):
 
     # new offsprings
     offsprings = []
-    # for _ in range(500):
-    #     p1 = random.randint(0, 100)
-    #     p2 = p1
-    #     while p2 == p1:
-    #         p2 = random.randint(0, 100)
-    #     offsprings.append(getOffspring(generation[p1], generation[p2]))
+    for _ in range(500):
+        p1 = random.randint(0, 100)
+        p2 = p1
+        while p2 == p1:
+            p2 = random.randint(0, 100)
+        offsprings.append(getOffspring(generation[p1], generation[p2]))
 
     # new mutations
     mutations = []
-    for _ in range(5000):
+    for _ in range(500):
         ind = random.randint(0, 100)
         mutations.append(getMutation(generation[ind]))
 
-    generation = mutations
-    # .extend(offsprings)
-    # generation.extend(mutations)
+    generation.extend(offsprings)
+    generation.extend(mutations)
