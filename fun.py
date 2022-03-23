@@ -69,8 +69,9 @@ letters = np.array([
     [24, 0.014500353986941815], [25, 0]])
 
 # coefs
-words = [word for word in english_words_lower_alpha_set]
-wordCoef = [1 for _ in english_words_lower_alpha_set]
+words = [word for word in english_words_lower_alpha_set if len(word) > 1]
+words.sort(key=lambda x:-len(x))
+wordCoef = [1 for _ in words]
 for i in range(len(words)):
     word = words[i]
     if word in wordKeys:
@@ -79,10 +80,13 @@ for i in range(len(words)):
 
 
 def detectTextByFoundWords(x):
+    cp = x
     count = 0
     for i in range(len(words)):
-        count = count + (x.count(words[i]) * wordCoef[i])
-    return -count
+        count = count + (cp.count(words[i]) * wordCoef[i])
+        cp = cp.replace(words[i], '.')
+    remaining = np.sum([1 for c in cp if c != '.'])
+    return -count / remaining
 
 
 def detectTextReality(x):
