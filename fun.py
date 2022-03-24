@@ -1,7 +1,11 @@
 from matplotlib import pyplot as plt
 from english_words import english_words_lower_alpha_set
+from matplotlib.font_manager import json_load
 import numpy as np
 import random
+
+from hmm import getLikelihood
+
 keyFound = ['When', 'in', 'the', 'course', 'of', 'human', 'events', 'it', 'becomes', 'necessary', 'for', 'one', 'people', 'to', 'dissolve', 'the', 'political', 'bands', 'which', 'have', 'connected', 'them', 'with', 'another', 'and', 'to', 'assume', 'among', 'the', 'powers', 'of', 'the', 'earth', 'the', 'separate', 'and', 'equal', 'station', 'to', 'which', 'the',
         'laws', 'of', 'nature', 'and', 'of', 'natures', 'god', 'entitle', 'them', 'a', 'decent', 'respect', 'to', 'the', 'opinions', 'of', 'mankind', 'requires', 'that', 'they', 'should', 'declare', 'the', 'causes', 'which', 'impel', 'them', 'to', 'the', 'separation', 'we', 'hold', 'these', 'truths', 'to', 'be', 'self', 'evident', 'that', 'all', 'men', 'are',
         'created', 'equal', 'that', 'they', 'are', 'endowed', 'by', 'their', 'creator', 'with', 'certain', 'unalienable', 'rights', 'that', 'among', 'these', 'are', 'life', 'liberty', 'and', 'the', 'pursuit', 'of', 'happiness', 'that', 'to', 'secure', 'these', 'rights', 'governments', 'are', 'instituted', 'among', 'men', 'deriving', 'their', 'just', 'powers', 'from',
@@ -9,7 +13,7 @@ keyFound = ['When', 'in', 'the', 'course', 'of', 'human', 'events', 'it', 'becom
         'organizing', 'its', 'powers', 'in', 'such', 'form', 'as', 'to', 'them', 'shall', 'seem', 'most', 'likely', 'to', 'effect', 'their', 'safety', 'and', 'happiness', 'prudence', 'indeed', 'will', 'dictate', 'that', 'governments', 'long', 'established', 'should', 'not', 'be', 'changed', 'for', 'light', 'and', 'transient', 'causes', 'and', 'accordingly', 'all',
         'experience', 'hath', 'shown', 'that', 'mankind', 'are', 'more', 'disposed', 'to', 'suffer', 'while', 'evils', 'are', 'sufferable', 'than', 'to', 'right', 'themselves', 'by', 'abolishing', 'the', 'forms', 'to', 'which', 'they', 'are', 'accustomed', 'but', 'when', 'a', 'long', 'train', 'of', 'abuses', 'and', 'usurpations', 'pursuing', 'invariably', 'the',
         'same', 'object', 'evinces', 'a', 'design', 'to', 'reduce', 'them', 'under', 'absolute', 'despotism', 'it', 'is', 'their', 'right', 'it', 'is', 'their', 'duty', 'to', 'throw', 'off', 'such', 'government', 'and', 'to', 'provide', 'new', 'guards', 'for', 'their', 'future', 'security', 'such', 'has', 'been', 'the', 'patient', 'sufferance', 'of', 'these',
-        'colonies', 'and', 'such', 'is', 'now', 'the', 'necessity', 'which', 'constrains', 'them', 'to', 'alter', 'their', 'former', 'systems', 'of', 'government', 'the', 'history', 'of', 'the', 'present', 'king', 'of', 'great', 'Britain', 'is', 'a', 'history', 'of', 'repeated', 'injuries', 'and', 'usurpations', 'all', 'having', 'in', 'direct', 'object', 'the',
+        'colonies', 'and', 'such', 'is', 'now', 'the', 'necessity', 'which', 'constrains', 'them', 'to', 'alter', 'their', 'former', 'systems', 'of', 'government', 'the', 'history', 'of', 'the', 'present', 'king', 'of', 'great', 'britain', 'is', 'a', 'history', 'of', 'repeated', 'injuries', 'and', 'usurpations', 'all', 'having', 'in', 'direct', 'object', 'the',
         'establishment', 'of', 'an', 'absolute', 'tyranny', 'over', 'these', 'states', 'to', 'prove', 'this', 'let', 'facts', 'be', 'submitted', 'to', 'a', 'candid', 'world', 'he', 'has', 'refused', 'his', 'assent', 'to', 'laws', 'the', 'most', 'wholesome', 'and', 'necessary', 'for', 'the', 'public', 'good', 'he', 'has', 'forbidden', 'his', 'governors', 'to',
         'pass', 'laws', 'of', 'immediate', 'and', 'pressing', 'importance', 'unless', 'suspended', 'in', 'their', 'operation', 'till', 'his', 'assent', 'should', 'be', 'obtained', 'and', 'when', 'so', 'suspended', 'he', 'has', 'utterly', 'neglected', 'to', 'attend', 'to', 'them', 'he', 'has', 'refused', 'to', 'pass', 'other', 'laws', 'for', 'the', 'accommodation',
         'of', 'large', 'districts', 'of', 'people', 'unless', 'those', 'people', 'would', 'relinquish', 'the', 'right', 'of', 'representation', 'in', 'the', 'legislature', 'a', 'right', 'inestimable', 'to', 'them', 'and', 'formidable', 'to', 'tyrants', 'only', 'he', 'has', 'called', 'together', 'legislative', 'bodies', 'at', 'places', 'unusual', 'uncomfortable', 'and',
@@ -28,12 +32,12 @@ keyFound = ['When', 'in', 'the', 'course', 'of', 'human', 'events', 'it', 'becom
         'most', 'barbarous', 'ages', 'and', 'totally', 'unworthy', 'the', 'head', 'of', 'a', 'civilized', 'nation', 'he', 'has', 'constrained', 'our', 'fellow', 'citizens', 'taken', 'captive', 'on', 'the', 'high', 'seas', 'to', 'bear', 'arms', 'against', 'their', 'country', 'to', 'become', 'the', 'executioners', 'of', 'their', 'friends', 'and',
         'brethren', 'or', 'to', 'fall', 'themselves', 'by', 'their', 'hands', 'he', 'has', 'excited', 'domestic', 'insurrections', 'amongst', 'us', 'and', 'has', 'endeavored', 'to', 'bring', 'on', 'the', 'inhabitants', 'of', 'our', 'frontiers', 'the', 'merciless', 'Indian', 'savages', 'whose', 'known', 'rule', 'of', 'warfare', 'is', 'an', 'undistinguished',
         'destruction', 'of', 'all', 'ages', 'sexes', 'and', 'conditions', 'in', 'every', 'stage', 'of', 'these', 'oppressions', 'we', 'have', 'petitioned', 'for', 'redress', 'in', 'the', 'most', 'humble', 'terms', 'our', 'repeated', 'petitions', 'have', 'been', 'answered', 'only', 'by', 'repeated', 'injury', 'a', 'prince', 'whole', 'character', 'is',
-        'thus', 'marked', 'by', 'every', 'act', 'which', 'may', 'define', 'a', 'tyrant', 'is', 'unfit', 'to', 'be', 'the', 'ruler', 'of', 'a', 'free', 'people', 'nor', 'have', 'we', 'been', 'wanting', 'in', 'attention', 'to', 'our', 'British', 'brethren', 'we', 'have', 'warned', 'them', 'from', 'time', 'to', 'time', 'of', 'attempts', 'by',
+        'thus', 'marked', 'by', 'every', 'act', 'which', 'may', 'define', 'a', 'tyrant', 'is', 'unfit', 'to', 'be', 'the', 'ruler', 'of', 'a', 'free', 'people', 'nor', 'have', 'we', 'been', 'wanting', 'in', 'attention', 'to', 'our', 'british', 'brethren', 'we', 'have', 'warned', 'them', 'from', 'time', 'to', 'time', 'of', 'attempts', 'by',
         'their', 'legislature', 'to', 'extend', 'an', 'unwarrantable', 'jurisdiction', 'over', 'us', 'we', 'have', 'reminded', 'them', 'of', 'the', 'circumstances', 'of', 'our', 'emigration', 'and', 'settlement', 'here', 'we', 'have', 'appealed', 'to', 'their', 'native', 'justice', 'and', 'magnanimity', 'and', 'we', 'have', 'conjured', 'them',
         'by', 'the', 'ties', 'of', 'our', 'common', 'kindred', 'to', 'disavow', 'these', 'usurpations', 'which', 'would', 'inevitably', 'interrupt', 'our', 'connections', 'and', 'correspondence', 'they', 'too', 'have', 'been', 'deaf', 'to', 'the', 'voice', 'of', 'justice', 'and', 'of', 'consanguinity', 'we', 'must', 'therefore', 'acquiesce',
         'in', 'the', 'necessity', 'which', 'denounces', 'our', 'separation', 'and', 'hold', 'them', 'as', 'we', 'hold', 'the', 'rest', 'of', 'mankind', 'enemies', 'in', 'war', 'in', 'peace', 'friends', 'we', 'therefore', 'the', 'representatives', 'of', 'the', 'united', 'states', 'of', 'America', 'in', 'general', 'congress', 'assembled',
         'appealing', 'to', 'the', 'supreme', 'judge', 'of', 'the', 'world', 'for', 'the', 'rectitude', 'of', 'our', 'intentions', 'do', 'in', 'the', 'name', 'and', 'by', 'authority', 'of', 'the', 'good', 'people', 'of', 'these', 'colonies', 'solemnly', 'publish', 'and', 'declare', 'that', 'these', 'united', 'colonies', 'are', 'and',
-        'of', 'right', 'ought', 'to', 'be', 'free', 'and', 'independent', 'states', 'that', 'they', 'are', 'absolved', 'from', 'all', 'allegiance', 'to', 'the', 'British', 'crown', 'and', 'that', 'all', 'political', 'connection', 'between', 'them', 'and', 'the', 'state', 'of', 'great', 'Britain', 'is', 'and', 'ought', 'to', 'be',
+        'of', 'right', 'ought', 'to', 'be', 'free', 'and', 'independent', 'states', 'that', 'they', 'are', 'absolved', 'from', 'all', 'allegiance', 'to', 'the', 'british', 'crown', 'and', 'that', 'all', 'political', 'connection', 'between', 'them', 'and', 'the', 'state', 'of', 'great', 'britain', 'is', 'and', 'ought', 'to', 'be',
         'totally', 'dissolved', 'and', 'that', 'as', 'free', 'and', 'independent', 'states', 'they', 'have', 'full', 'power', 'to', 'levy', 'war', 'conclude', 'peace', 'contract', 'alliances', 'establish', 'commerce', 'and', 'to', 'do', 'all', 'other', 'acts', 'and', 'things', 'which', 'independent', 'states', 'may', 'of', 'right',
         'do', 'and', 'for', 'the', 'support', 'of', 'this', 'declaration', 'with', 'a', 'firm', 'reliance', 'on', 'the', 'protection', 'of', 'divine', 'providence', 'we', 'mutually', 'pledge', 'to', 'each', 'other', 'our', 'lives', 'our', 'fortunes', 'and', 'our', 'sacred', 'honor']
 
@@ -49,70 +53,13 @@ became = ''.join([keyFound[x-1][0] for x in t1])
 
 
 # english truth
-wordKeys = ['the', 'of', 'and', 'to', 'in', 'is', 'that', 'was', 'for', 'with']
-wordValues = np.array([0.3026800785062991, 0.1461715514346583, 0.12687510486717887, 0.12221704261204332, 0.09153611104210377,
-                       0.04681200012204337, 0.04671400231076448, 0.04401381499014022, 0.04122479639548728, 0.03175549771928139])
 
-letters = np.array([
-    [0, 0.07331462883813619], [1, 0.017410913286309882],
-    [2, 0.03277656868657734], [3, 0.03471694155282272],
-    [4, 0.14086058158743478], [5, 0.02858116789469544],
-    [6, 0.012612423630594961], [7, 0.054985971628602144],
-    [8, 0.06883079424181242], [9, 0.00280567427957102],
-    [10, 0.001415947767260141], [11, 0.04001363505257362],
-    [12, 0.01974460497679419], [13, 0.07260665495450612],
-    [14, 0.07444214280095446], [15, 0.021055667724257283],
-    [16, 0], [17, 0.06101686026693238],
-    [18, 0.07480924037024413], [19, 0.10344285077483809],
-    [20, 0.023887563258777566], [21, 0.012691087395442746],
-    [22, 0.010173846920313607], [23, 0.003303878123606996],
-    [24, 0.014500353986941815], [25, 0]])
-
-# coefs
-words = [word for word in english_words_lower_alpha_set if len(word) > 1]
-words.sort(key=lambda x:-len(x))
-wordCoef = [1 for _ in words]
-for i in range(len(words)):
-    word = words[i]
-    if word in wordKeys:
-        value = wordValues[wordKeys.index(word)]
-        wordCoef[i] = value / np.min(wordValues)
+def detectLikelihoodLoss(x):
+    return -getLikelihood(x)
 
 
-def detectTextByFoundWords(x):
-    cp = x
-    count = 0
-    for i in range(len(words)):
-        count = count + (cp.count(words[i]) * wordCoef[i])
-        cp = cp.replace(words[i], '.')
-    remaining = np.sum([1 for c in cp if c != '.'])
-    return -count / remaining
-
-
-def detectTextReality(x):
-    def mse(p, t):
-        lp = np.log(p+1)
-        lt = np.log(t+1)
-        diff = lp - lt
-        sq = np.abs(diff)
-        return np.mean(sq)
-
-    # letters
-    cs = [ord(c) - 97 for c in x]
-    hist = np.histogram(cs, range=[0, 26], bins=26)
-    histNorm = hist[0] / np.sum(hist[0])
-    mseLetters = mse(histNorm, letters[:, 1])
-
-    # words
-    wFreq = [x.count(w) for w in wordKeys]
-    wFreq = wFreq / np.sum(wFreq)
-    mseWords = mse(wFreq, wordValues)
-
-    return mseWords + mseLetters
-
-
-print(detectTextByFoundWords(toBe))
-print(detectTextByFoundWords(became))
+print(detectLikelihoodLoss(toBe))
+print(detectLikelihoodLoss(became))
 
 # GA
 subject = t2
@@ -161,13 +108,13 @@ while(True):
         if(g['result'] == None):
             g['result'] = applyKey(g['key'])
         if(g['loss'] == None):
-            g['loss'] = detectTextByFoundWords(g['result'])
+            g['loss'] = detectLikelihoodLoss(g['result'])
 
     # sort
     generation.sort(key=lambda x: x['loss'])
 
     print(F"""GENERATION: {gCount} TOP 3:
-    
+
     loss: {generation[0]['loss']}
     text: {generation[0]['result']}
     
