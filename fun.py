@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from english_words import english_words_lower_alpha_set
 import numpy as np
 import random
-key1 = ['When', 'in', 'the', 'course', 'of', 'human', 'events', 'it', 'becomes', 'necessary', 'for', 'one', 'people', 'to', 'dissolve', 'the', 'political', 'bands', 'which', 'have', 'connected', 'them', 'with', 'another', 'and', 'to', 'assume', 'among', 'the', 'powers', 'of', 'the', 'earth', 'the', 'separate', 'and', 'equal', 'station', 'to', 'which', 'the',
+keyFound = ['When', 'in', 'the', 'course', 'of', 'human', 'events', 'it', 'becomes', 'necessary', 'for', 'one', 'people', 'to', 'dissolve', 'the', 'political', 'bands', 'which', 'have', 'connected', 'them', 'with', 'another', 'and', 'to', 'assume', 'among', 'the', 'powers', 'of', 'the', 'earth', 'the', 'separate', 'and', 'equal', 'station', 'to', 'which', 'the',
         'laws', 'of', 'nature', 'and', 'of', 'natures', 'god', 'entitle', 'them', 'a', 'decent', 'respect', 'to', 'the', 'opinions', 'of', 'mankind', 'requires', 'that', 'they', 'should', 'declare', 'the', 'causes', 'which', 'impel', 'them', 'to', 'the', 'separation', 'we', 'hold', 'these', 'truths', 'to', 'be', 'self', 'evident', 'that', 'all', 'men', 'are',
         'created', 'equal', 'that', 'they', 'are', 'endowed', 'by', 'their', 'creator', 'with', 'certain', 'unalienable', 'rights', 'that', 'among', 'these', 'are', 'life', 'liberty', 'and', 'the', 'pursuit', 'of', 'happiness', 'that', 'to', 'secure', 'these', 'rights', 'governments', 'are', 'instituted', 'among', 'men', 'deriving', 'their', 'just', 'powers', 'from',
         'the', 'consent', 'of', 'the', 'governed', 'that', 'whenever', 'any', 'form', 'of', 'government', 'becomes', 'destructive', 'of', 'these', 'ends', 'it', 'is', 'the', 'right', 'of', 'the', 'people', 'to', 'alter', 'or', 'to', 'abolish', 'it', 'and', 'to', 'institute', 'new', 'government', 'laying', 'its', 'foundation', 'on', 'such', 'principles', 'and',
@@ -45,7 +45,7 @@ t3 = [317, 8, 92, 73, 112, 89, 67, 318, 28, 96, 107, 41, 631, 78, 146, 397, 118,
       173, 66, 9, 35, 16, 95, 8, 113, 175, 90, 56, 203, 19, 177, 183, 206, 157, 200, 218, 260, 291, 305, 618, 951, 320, 18, 124, 78, 65, 19, 32, 124, 48, 53, 57, 84, 96, 207, 244, 66, 82, 119, 71, 11, 86, 77, 213, 54, 82, 316, 245, 303, 86, 97, 106, 212, 18, 37, 15, 81, 89, 16, 7, 81, 39, 96, 14, 43, 216, 118, 29, 55, 109, 136, 172, 213, 64, 8, 227, 304, 611, 221, 364, 819, 375, 128, 296, 1, 18, 53, 76, 10, 15, 23, 19, 71, 84, 120, 134, 66, 73, 89, 96, 230, 48, 77, 26, 101, 127, 936, 218, 439, 178, 171, 61, 226, 313, 215, 102, 18, 167, 262, 114, 218, 66, 59, 48, 27, 19, 13, 82, 48, 162, 119, 34, 127, 139, 34, 128, 129, 74, 63, 120, 11, 54, 61, 73, 92, 180, 66, 75, 101, 124, 265, 89, 96, 126, 274, 896, 917, 434, 461, 235, 890, 312, 413, 328, 381, 96, 105, 217, 66, 118, 22, 77, 64, 42, 12, 7, 55, 24, 83, 67, 97, 109, 121, 135, 181, 203, 219, 228, 256, 21, 34, 77, 319, 374, 382, 675, 684, 717, 864, 203, 4, 18, 92, 16, 63, 82, 22, 46, 55, 69, 74, 112, 134, 186, 175, 119, 213, 416, 312, 343, 264, 119, 186, 218, 343, 417, 845, 951, 124, 209, 49, 617, 856, 924, 936, 72, 19, 28, 11, 35, 42, 40, 66, 85, 94, 112, 65, 82, 115, 119, 236, 244, 186, 172, 112, 85, 6, 56, 38, 44, 85, 72, 32, 47, 63, 96, 124, 217, 314, 319, 221, 644, 817, 821, 934, 922, 416, 975, 10, 22, 18, 46, 137, 181, 101, 39, 86, 103, 116, 138, 164, 212, 218, 296, 815, 380, 412, 460, 495, 675, 820, 952]
 
 toBe = "ihavedepositedinthecountyofbedfordaboutfourmilesfrombufordsinanexcavationorvaultsixfeetbelowthesurfaceofthegroundthefollowingarticlesbelongingjointlytothepartieswhosenamesaregiveninnumberthreeherewiththefirstdepositconsistedoftenhundredandfourteenpoundsofgoldandthirtyeighthundredandtwelvepoundsofsilverdepositednoveighteennineteenthesecondwasmadedeceighteentwentyoneandconsistedofnineteenhundredandsevenpoundsofgoldandtwelvehundredandeightyeightofsilveralsojewelsobtainedinstlouisinexchangetosavetransportationandvaluedatthirteenthousanddollarstheaboveissecurelypackedinironpotswithironcoversthevaultisroughlylinedwithstoneandthevesselsrestonsolidstoneandarecoveredwithotherspapernumberonedescribestheexactlocalityofthevaultsothatnodifficultywillbehadinfindingit"
-became = ''.join([key1[x-1][0] for x in t1])
+became = ''.join([keyFound[x-1][0] for x in t1])
 
 
 # english truth
@@ -117,27 +117,25 @@ print(detectTextByFoundWords(became))
 # GA
 subject = t2
 generationSize = 1000
-mn = np.min(subject)
-mx = np.max(subject)
+keys = set(subject)
 generation = [
     {
-        'key': [chr(97 + random.randint(0, 25)) for _ in range(mx)],
+        'key': {key: chr(97 + random.randint(0, 25)) for key in keys},
         'result': None,
         'loss': None
     } for _ in range(generationSize)
 ]
 
 
-def applyKey(t, k):
-    result = ''.join([k[x-1] for x in t1])
+def applyKey(k):
+    result = ''.join([k[x] for x in subject])
     return result
 
 
 def getOffspring(g1, g2):
     key1 = g1['key']
     key2 = g2['key']
-    keyChild = [key1[i] if random.random() > .5 else key2[i]
-                for i in range(len(key1))]
+    keyChild = {key: key1[key] if random.random() > .5 else key2[key] for key in key1}
     return {
         'key': keyChild,
         'result': None,
@@ -147,8 +145,7 @@ def getOffspring(g1, g2):
 
 def getMutation(ind):
     keyParent = ind['key']
-    keyChild = [keyParent[i] if random.random() > .1 else chr(
-        97 + random.randint(0, 25)) for i in range(len(keyParent))]
+    keyChild = {key: keyParent[key] if random.random() > .1 else chr(97 + random.randint(0, 25)) for key in keyParent}
     return {
         'key': keyChild,
         'result': None,
@@ -162,15 +159,15 @@ while(True):
     # analyze
     for g in generation:
         if(g['result'] == None):
-            g['result'] = applyKey(subject, g['key'])
+            g['result'] = applyKey(g['key'])
         if(g['loss'] == None):
             g['loss'] = detectTextByFoundWords(g['result'])
 
     # sort
     generation.sort(key=lambda x: x['loss'])
 
-    print(F"""GENERATION: {gCount}
-    TOP 3:
+    print(F"""GENERATION: {gCount} TOP 3:
+    
     loss: {generation[0]['loss']}
     text: {generation[0]['result']}
     
