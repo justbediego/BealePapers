@@ -53,13 +53,76 @@ became = ''.join([keyFound[x-1][0] for x in t1])
 
 
 # english truth
+wordKeys = ['the', 'of', 'and', 'to', 'in', 'is', 'that', 'was', 'for', 'with']
+wordValues = np.array([0.3026800785062991, 0.1461715514346583, 0.12687510486717887, 0.12221704261204332, 0.09153611104210377,
+                       0.04681200012204337, 0.04671400231076448, 0.04401381499014022, 0.04122479639548728, 0.03175549771928139])
+
+letters = np.array([
+    [0, 0.07331462883813619], [1, 0.017410913286309882],
+    [2, 0.03277656868657734], [3, 0.03471694155282272],
+    [4, 0.14086058158743478], [5, 0.02858116789469544],
+    [6, 0.012612423630594961], [7, 0.054985971628602144],
+    [8, 0.06883079424181242], [9, 0.00280567427957102],
+    [10, 0.001415947767260141], [11, 0.04001363505257362],
+    [12, 0.01974460497679419], [13, 0.07260665495450612],
+    [14, 0.07444214280095446], [15, 0.021055667724257283],
+    [16, 0], [17, 0.06101686026693238],
+    [18, 0.07480924037024413], [19, 0.10344285077483809],
+    [20, 0.023887563258777566], [21, 0.012691087395442746],
+    [22, 0.010173846920313607], [23, 0.003303878123606996],
+    [24, 0.014500353986941815], [25, 0]])
+
+# coefs
+words = [word for word in english_words_lower_alpha_set if len(word) > 1]
+words.sort(key=lambda x:-len(x))
+wordCoef = [1 for _ in words]
+for i in range(len(words)):
+    word = words[i]
+    if word in wordKeys:
+        value = wordValues[wordKeys.index(word)]
+        wordCoef[i] = value / np.min(wordValues)
+
+
+def detectTextByFoundWords(x):
+    cp = x
+    count = 0
+    for i in range(len(words)):
+        count = count + (cp.count(words[i]) * wordCoef[i])
+        cp = cp.replace(words[i], '.')
+    remaining = np.sum([1 for c in cp if c != '.'])
+    return -count / remaining
+
+
+def detectTextReality(x):
+    def mse(p, t):
+        lp = np.log(p+1)
+        lt = np.log(t+1)
+        diff = lp - lt
+        sq = np.abs(diff)
+        return np.mean(sq)
+
+    # letters
+    cs = [ord(c) - 97 for c in x]
+    hist = np.histogram(cs, range=[0, 26], bins=26)
+    histNorm = hist[0] / np.sum(hist[0])
+    mseLetters = mse(histNorm, letters[:, 1])
+
+    # words
+    wFreq = [x.count(w) for w in wordKeys]
+    wFreq = wFreq / np.sum(wFreq)
+    mseWords = mse(wFreq, wordValues)
+
+    return mseWords + mseLetters
 
 def detectLikelihoodLoss(x):
     return -getLikelihood(x)
 
 
-print(detectLikelihoodLoss(toBe))
-print(detectLikelihoodLoss(became))
+def detectCompleteLoss(x):
+    return detectLikelihoodLoss(x) / 1000 + detectTextByFoundWords(x) + detectTextReality(x) * 100
+
+print(detectCompleteLoss(toBe))
+print(detectCompleteLoss(became))
 
 # GA
 subject = t2
@@ -108,7 +171,7 @@ while(True):
         if(g['result'] == None):
             g['result'] = applyKey(g['key'])
         if(g['loss'] == None):
-            g['loss'] = detectLikelihoodLoss(g['result'])
+            g['loss'] = detectCompleteLoss(g['result'])
 
     # sort
     generation.sort(key=lambda x: x['loss'])
