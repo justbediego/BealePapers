@@ -62,11 +62,33 @@ def applyKey(text, key):
 
 became = applyKey(t2, keyFound)
 
+
+def getJumpProbability(text):
+    kd = getKeyDisribution(text)
+    keys = [x[1] for x in kd]
+    size = len(kd) + 1
+    ps = np.zeros((size, size), dtype=np.float32)
+    lastCode = keys.index(text[0])
+    for i in range(1, len(text)):
+        code = keys.index(text[i])
+        ps[lastCode, code] = ps[lastCode, code] + 1
+        lastCode = code
+    # change
+    ps = ps / (np.sum(ps, axis = 1)+1).reshape(size, 1)
+    result = []
+    for i in range(size):
+        for j in range(size):
+            if ps[i, j] > 0:
+                result.append([i, j, np.log(ps[i, j])])
+    result.sort(key=lambda x: -x[2])
+    return result
+ 
+
 def getKeyDisribution(x, foundKey = None): 
     maxKey = np.max(x)
     if foundKey == None:
-        foundKey = {i:'?' for i in range(maxKey)}
-    hist = np.histogram(x, range=[1, maxKey], bins=maxKey - 1)
+        foundKey = {(i+1):'?' for i in range(maxKey)}
+    hist = np.histogram(x, range=[1, maxKey+1], bins=maxKey)
     hist = [[hist[0][i] / np.sum(hist[0]), hist[1][i], foundKey[hist[1][i]]] for i in range(len(hist[0])) if hist[0][i] > 0]
     hist.sort(key=lambda j:-j[0])
 
@@ -75,9 +97,14 @@ def getKeyDisribution(x, foundKey = None):
 
     return hist
 
-h1 = getKeyDisribution(t1)
-h2 = getKeyDisribution(t2, keyFound)
-h3 = getKeyDisribution(t3)
+h1 = getJumpProbability(t1)
+h2 = getJumpProbability(t2)
+h3 = getJumpProbability(t3)
+
+plt.plot([x[2] for x in h1])
+plt.plot([x[2] for x in h2])
+plt.plot([x[2] for x in h3])
+plt.show()
 
 newKey3 = foundKey = {i:'?' for i in set(t1)}
 for i in range(len(h3)):
