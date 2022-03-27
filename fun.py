@@ -68,10 +68,10 @@ def getKeyDisribution(x, foundKey = None):
         foundKey = {i:'?' for i in range(maxKey)}
     hist = np.histogram(x, range=[1, maxKey], bins=maxKey - 1)
     hist = [[hist[0][i] / np.sum(hist[0]), hist[1][i], foundKey[hist[1][i]]] for i in range(len(hist[0])) if hist[0][i] > 0]
-    # hist.sort(key=lambda j:-j[0])
+    hist.sort(key=lambda j:-j[0])
 
     #plot
-    plt.plot([x[0] for x in hist])
+    # plt.plot([x[0] for x in hist])
 
     return hist
 
@@ -79,13 +79,13 @@ h1 = getKeyDisribution(t1)
 h2 = getKeyDisribution(t2, keyFound)
 h3 = getKeyDisribution(t3)
 
-newKey1 = foundKey = {i:'?' for i in set(t1)}
-for i in range(50):
-    newKey1[h1[i][1]] = h2[i][2]
+newKey3 = foundKey = {i:'?' for i in set(t1)}
+for i in range(len(h3)):
+    newKey3[h3[i][1]] = toBe[int(h3[i][1])+1] if h3[i][1] < len(toBe) + 1 else '?'
 
-newText = applyKey(t1, newKey1)
+newText = applyKey(t1, newKey3)
 
-plt.show()
+# plt.show()
 
 
 # english truth
